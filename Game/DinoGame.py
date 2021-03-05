@@ -23,7 +23,7 @@ DINO_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","
 
 BIRD_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","bird01.png"))), pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","bird02.png")))]
 DINO_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","dino01.png"))), pygame.transform.scale2x(pygame.transform.scale(pygame.image.load(os.path.join("Game/IMGS","dinoRun01.png")),(24,28))), pygame.transform.scale2x(pygame.transform.scale(pygame.image.load(os.path.join("Game/IMGS","dinoRun02.png")),(24,28))), pygame.transform.scale2x(pygame.transform.scale(pygame.image.load(os.path.join("Game/IMGS","dinoDuck01Fixed.png")),(34,28))), pygame.transform.scale2x(pygame.transform.scale(pygame.image.load(os.path.join("Game/IMGS","dinoDuck02Fixed.png")),(34,28))), pygame.transform.scale2x(pygame.transform.scale(pygame.image.load(os.path.join("Game/IMGS","dinoJump01.png")),(24,25))), pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","dinoDeath01.png")))]
-CACTUS_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","BigCactus01.png"))), pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","SmallCactus01.png"))), pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","ManySmallCactus01.png")))]
+CACTUS_IMGS = [pygame.transform.scale2x(pygame.transform.scale(pygame.image.load(os.path.join("Game/IMGS","BigCactus01.png")),(12,20) )), pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","SmallCactus01.png"))), pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","ManySmallCactus01.png")))]
 GROUND_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","ground.png")))
 CLOUD_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","cloud.png")))
 
@@ -189,6 +189,49 @@ class Dino:
                 self.img_count = 0
         
         win.blit(self.img, (self.x,self.y))
+    
+    #_FUNCTION FOR COLISION_#
+    """ Uses the mask to be more acurrate for the user in colision, and not use boxes """
+    def get_mask(self):
+        return pygame.mask.from_surface(self.img)
+
+###_CREATES THE OBJECT CACTUS_###
+class Cactus:
+    VEL = 5
+
+    #_FUNCTION CREATES ATRIBUTES OF PIPE | CONSTRUCTOR_#
+    def __init__(self, x, y):
+        self.x = x
+        self.height = y
+
+        self.img = CACTUS_IMGS[0]
+
+        self.passed = False #for colision purposes and AI
+    
+    #_FUNCTION TO MOVE THE PIPE IN X AXIS_#
+    def move(self):
+        self.x -= self.VEL  #Moves the pipe to the left
+    
+    #_FUCNTION TO DISPLAY PIPE_#
+    def draw(self, win):
+        win.blit(self.img, (self.x, self.height))
+    
+    #_COLITION USING MASK TO BE MORE ACCURATE WITH THE COLISION BOX_#
+    """ There will be colision box, however inside the colision box there us a mask (shaped like the bird and the pipe, by checking if the background is transparent) 
+    son that although the boxes touch themselves, but the mask dn't, then tere is no colision."""
+    def collide(self, dino, win):
+        dino_mask = dino.get_mask() #saves the positions of the dinosaur image
+        cactus_mask = pygame.mask.from_surface(self.img)    #saves the obstacle position of the cactus
+
+        #checks if the masks collide
+        offset = (self.x - dino.x, self.height - round(dino.y))
+
+        point = dino_mask.overlap(cactus_mask, offset)
+
+        if (point):
+            return True
+         
+        return False
 
 #################
 ###___GAME____###
@@ -196,10 +239,11 @@ class Dino:
 
 ###__GAME FUNCTIONS__###
 #_FUNCTION THAT CREATES A SCREEEN_#
-def draw_window(screen, ground, dino):
+def draw_window(screen, ground, dino, cactus):
     screen.fill(WHITE)
     ground.draw(screen) #Displays ground
     dino.draw(screen)   #Displays dinosaur
+    cactus.draw(screen)
     pygame.display.update() #refreshes
 
 #_FUCNTION THAT PALYS THE GAME_#
@@ -207,6 +251,7 @@ def main():
     #_Creating Objects_#
     ground = Ground(125) #creates and sets the ground
     dino = Dino(0,95)   #creates and setes the dinosaur
+    cactus = Cactus(550, 110)   #creates a single cactus
 
     screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT)) #sets the window size
     screen.fill(WHITE)
@@ -232,10 +277,14 @@ def main():
         if keys[pygame.K_DOWN]:
             dino.duck()
 
+        if cactus.collide(dino, screen):
+            print('TOUCHED')
+
         ground.move()   #Makes the ground move to give a perseption of running
         dino.move()     #Makes the dinosaur constantly run
+        cactus.move()
 
-        draw_window(screen, ground, dino) #calls the function "draw_window"
+        draw_window(screen, ground, dino, cactus) #calls the function "draw_window"
 
 
 main()
