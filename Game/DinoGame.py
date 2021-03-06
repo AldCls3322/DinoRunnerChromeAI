@@ -17,7 +17,7 @@ BLACK = (0,0,0)
 # DINO_RUN_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","dinoRun01.png"))), pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","dinoRun02.png")))]
 # DINO_DUCK_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","dinoDuck01.png"))), pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","dinoDuck02.png")))]
 # DINO_JUMP_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","dinoJump01.png")))
-DINO_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","dino01.png")))
+# DINO_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","dino01.png")))
 # S_CACTUS_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","SmallCactus01.png")))
 # B_CACTUS_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","BigCactus01.png")))
 
@@ -96,6 +96,24 @@ class Ground:
         win.blit(self.IMG, (self.x1, self.y))   #blit function is like draw
         win.blit(self.IMG, (self.x2, self.y))
 
+###__Creates/Defines an object Cloud__###
+class Cloud:
+    VEL = 7
+    IMG = CLOUD_IMG
+
+    def __init__(self, x):
+        self.y = random.randint(0,80)
+        self.x = x
+    
+    #_FUNCTION TO MOVE THE BASE IN X AXIS_#
+    """ Creates 2 images to be rotating and cycling giving the preseption of infinite movement """
+    def move(self):
+        self.x -= self.VEL
+
+    #_FUCNTION TO DISPLAY THE GROUND_#   
+    def draw(self, win):
+        win.blit(self.IMG, (self.x, self.y))   #blit function is like draw
+
 ###__CREATES THE OBJECT DINOSAUR__###
 class Dino:
     ##_CONSTANT VARIABLES USED_##
@@ -116,7 +134,7 @@ class Dino:
 
     #_FUNCTION THAT ESTABLISHES A JUMP_#
     def jump(self):
-        self.vel = -8    # moves up the screen, on minus Y axis
+        self.vel = -10.5    # moves up the screen, on minus Y axis
         self.height = self.y
         if (self.isJumping == False):
             self.tick_count = 0
@@ -140,7 +158,11 @@ class Dino:
                 self.isJumping = False
 
             else:
-                d = self.vel*self.tick_count + self.tick_count**2   # Physics formula for parabolic trayectory
+                if (self.y < 60):
+                    d = self.vel*self.tick_count + 1.2*self.tick_count**2   # Physics formula for parabolic trayectory
+                
+                else:
+                    d = self.vel*self.tick_count + 1.5*self.tick_count**2   # Physics formula for parabolic trayectory
 
                 #establishes a limit of speed for the movement
                 if d >= 16:
@@ -246,17 +268,24 @@ class Cactus:
 
 ###__GAME FUNCTIONS__###
 #_FUNCTION THAT CREATES A SCREEEN_#
-def draw_window(screen, ground, dino, cactus):
+def draw_window(screen, ground, clouds, dino, cacti):
     screen.fill(WHITE)
     ground.draw(screen) #Displays ground
+    
+    for cloud in clouds:
+        cloud.draw(screen)
+
     dino.draw(screen)   #Displays dinosaur
-    cactus.draw(screen)
+    
+    for cactus in cacti:
+        cactus.draw(screen)
     pygame.display.update() #refreshes
 
 #_FUCNTION THAT PALYS THE GAME_#
 def main():
     #_Creating Objects_#
     ground = Ground(125) #creates and sets the ground
+    clouds = [Cloud(600)]
     dino = Dino(0,95)   #creates and setes the dinosaur
     #cactus = Cactus(550)   #creates a single cactus
     cacti = [Cactus(550)]
@@ -264,6 +293,11 @@ def main():
     screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT)) #sets the window size
     screen.fill(WHITE)
     clock = pygame.time.Clock() #creates a control for frame rates
+
+    prev_cactus = 600
+    for i in range(2):
+        prev_cactus += random.randint(300,600)
+        cacti.append(Cactus(prev_cactus))
 
     run = True
     while run: #Plays game while you don't quit
@@ -285,7 +319,7 @@ def main():
             dino.duck() #makes dinosaur duck
 
         add_cactus = False  #establishes not to add a cactus
-        rem = []    #for saving which cactus to delete
+        rem_cactus = []    #for saving which cactus to delete
         for cactus in cacti:
             
             if (not cactus.passed and cactus.x < dino.x):   #until the dinosaur passes the cactus it will create another one
@@ -295,21 +329,44 @@ def main():
             if cactus.collide(dino, screen):
                 print('TOUCHED')
             
-            if (cactus.x < 0):
-                rem.append(cactus)
+            if (cactus.x < -30):
+                rem_cactus.append(cactus)
             
             cactus.move()
         
+        
         if (add_cactus):
-            cacti.append(Cactus(600))
+            prev_cactus = cacti[len(cacti)-1].x
+            prev_cactus += random.randint(200,600)
+            cacti.append(Cactus(prev_cactus))
 
-        for re in rem:
+        for re in rem_cactus:
             cacti.remove(re)
+        
+        
+        add_cloud = False
+        rem_cloud = []
+        for cloud in clouds:
+            if (cloud.x < -99):
+                add_cloud = True
+            
+            if (cloud.x < -100):
+                rem_cloud.append(cloud)
+            
+            cloud.move()
+
+        if (add_cloud):
+            clouds = [Cloud(600)]
+            add_cloud = False
+        
+        for r in rem_cloud:
+            clouds.remove(r)
+        
 
         ground.move()   #Makes the ground move to give a perseption of running
         dino.move()     #Makes the dinosaur constantly run
 
-        draw_window(screen, ground, dino, cactus) #calls the function "draw_window"
+        draw_window(screen, ground, clouds, dino, cacti) #calls the function "draw_window"
 
 
 main()
