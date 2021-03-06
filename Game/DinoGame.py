@@ -23,7 +23,7 @@ DINO_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","
 
 BIRD_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","bird01.png"))), pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","bird02.png")))]
 DINO_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","dino01.png"))), pygame.transform.scale2x(pygame.transform.scale(pygame.image.load(os.path.join("Game/IMGS","dinoRun01.png")),(24,28))), pygame.transform.scale2x(pygame.transform.scale(pygame.image.load(os.path.join("Game/IMGS","dinoRun02.png")),(24,28))), pygame.transform.scale2x(pygame.transform.scale(pygame.image.load(os.path.join("Game/IMGS","dinoDuck01Fixed.png")),(34,28))), pygame.transform.scale2x(pygame.transform.scale(pygame.image.load(os.path.join("Game/IMGS","dinoDuck02Fixed.png")),(34,28))), pygame.transform.scale2x(pygame.transform.scale(pygame.image.load(os.path.join("Game/IMGS","dinoJump01.png")),(24,25))), pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","dinoDeath01.png")))]
-CACTUS_IMGS = [pygame.transform.scale2x(pygame.transform.scale(pygame.image.load(os.path.join("Game/IMGS","BigCactus01.png")),(12,20) )), pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","SmallCactus01.png"))), pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","ManySmallCactus01.png")))]
+CACTUS_IMGS = [pygame.transform.scale2x(pygame.transform.scale(pygame.image.load(os.path.join("Game/IMGS","BigCactus01.png")),(15,30) )), pygame.transform.scale2x(pygame.transform.scale(pygame.image.load(os.path.join("Game/IMGS","SmallCactus01.png")),(10,20) )), pygame.transform.scale2x(pygame.transform.scale(pygame.image.load(os.path.join("Game/IMGS","ManySmallCactus01.png")), (30,20) ))]
 GROUND_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","ground.png")))
 CLOUD_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","cloud.png")))
 
@@ -69,7 +69,7 @@ class Bird:
 
 ###__Creates/Defines an object Base__###
 class Ground:
-    VEL = 5
+    VEL = 7
     WIDTH = GROUND_IMG.get_width()
     IMG = GROUND_IMG
 
@@ -116,7 +116,7 @@ class Dino:
 
     #_FUNCTION THAT ESTABLISHES A JUMP_#
     def jump(self):
-        self.vel = -10.5    # moves up the screen, on minus Y axis
+        self.vel = -8    # moves up the screen, on minus Y axis
         self.height = self.y
         if (self.isJumping == False):
             self.tick_count = 0
@@ -140,7 +140,7 @@ class Dino:
                 self.isJumping = False
 
             else:
-                d = self.vel*self.tick_count + 1.5*self.tick_count**2   # Physics formula for parabolic trayectory
+                d = self.vel*self.tick_count + self.tick_count**2   # Physics formula for parabolic trayectory
 
                 #establishes a limit of speed for the movement
                 if d >= 16:
@@ -197,14 +197,21 @@ class Dino:
 
 ###_CREATES THE OBJECT CACTUS_###
 class Cactus:
-    VEL = 5
+    VEL = 7
 
     #_FUNCTION CREATES ATRIBUTES OF PIPE | CONSTRUCTOR_#
-    def __init__(self, x, y):
+    def __init__(self, x):
         self.x = x
-        self.height = y
+        self.height = 90
 
-        self.img = CACTUS_IMGS[0]
+        cacltus_id = random.randint(0,1)
+
+        if (cacltus_id == 0):
+            self.height = 90
+        else:
+            self.height = 110
+
+        self.img = CACTUS_IMGS[cacltus_id]
 
         self.passed = False #for colision purposes and AI
     
@@ -251,7 +258,8 @@ def main():
     #_Creating Objects_#
     ground = Ground(125) #creates and sets the ground
     dino = Dino(0,95)   #creates and setes the dinosaur
-    cactus = Cactus(550, 110)   #creates a single cactus
+    #cactus = Cactus(550)   #creates a single cactus
+    cacti = [Cactus(550)]
 
     screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT)) #sets the window size
     screen.fill(WHITE)
@@ -272,17 +280,34 @@ def main():
                 # if event.key == pygame.K_DOWN:
                 #     dino.duck()
 
-        keys = pygame.key.get_pressed()
+        keys = pygame.key.get_pressed() #checks for a key of the keyboard is being pressed
+        if keys[pygame.K_DOWN]: #if the key is the down arrow, then it will
+            dino.duck() #makes dinosaur duck
 
-        if keys[pygame.K_DOWN]:
-            dino.duck()
+        add_cactus = False  #establishes not to add a cactus
+        rem = []    #for saving which cactus to delete
+        for cactus in cacti:
+            
+            if (not cactus.passed and cactus.x < dino.x):   #until the dinosaur passes the cactus it will create another one
+                cactus.passed = True
+                add_cactus = True
 
-        if cactus.collide(dino, screen):
-            print('TOUCHED')
+            if cactus.collide(dino, screen):
+                print('TOUCHED')
+            
+            if (cactus.x < 0):
+                rem.append(cactus)
+            
+            cactus.move()
+        
+        if (add_cactus):
+            cacti.append(Cactus(600))
+
+        for re in rem:
+            cacti.remove(re)
 
         ground.move()   #Makes the ground move to give a perseption of running
         dino.move()     #Makes the dinosaur constantly run
-        cactus.move()
 
         draw_window(screen, ground, dino, cactus) #calls the function "draw_window"
 

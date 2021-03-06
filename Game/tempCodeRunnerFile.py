@@ -1,4 +1,2 @@
-keys = pygame.key.get_pressed()
-
-        # if keys[pygame.K_DOWN]:
-        #     dino.duck()
+    cactus.passed = True
+                add_cactus = True
