@@ -13,6 +13,9 @@ WIN_HEIGHT = 150
 WHITE = (255,255,255)
 BLACK = (0,0,0)
 
+#_FONTS_#
+SCORE_FONT = pygame.font.SysFont("Rockwell", 24)    #"Speak Pro" "Source Sans Pro"
+
 #_IMAGES_#
 # DINO_RUN_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","dinoRun01.png"))), pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","dinoRun02.png")))]
 # DINO_DUCK_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","dinoDuck01.png"))), pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS","dinoDuck02.png")))]
@@ -279,7 +282,7 @@ class Cactus:
 
 ###__GAME FUNCTIONS__###
 #_FUNCTION THAT CREATES A SCREEEN_#
-def draw_window(screen, ground, clouds, dino, birds, cacti):
+def draw_window(screen, ground, clouds, dino, birds, cacti, score):
     screen.fill(WHITE)
     ground.draw(screen) #Displays ground
     
@@ -293,6 +296,11 @@ def draw_window(screen, ground, clouds, dino, birds, cacti):
     
     for cactus in cacti:
         cactus.draw(screen)
+
+    #Score Dispay#
+    score_label = SCORE_FONT.render("Score: " + str(score),1,BLACK)
+    screen.blit(score_label, (WIN_WIDTH - score_label.get_width() - 15,10))
+
     pygame.display.update() #refreshes
 
 #_FUCNTION THAT PALYS THE GAME_#
@@ -309,6 +317,8 @@ def main():
     screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT)) #sets the window size
     screen.fill(WHITE)  # makes the background WHITE
     clock = pygame.time.Clock() #creates a control for frame rates
+
+    score = 0   # Establishes tha start for scoring
 
     #_Makes the obstacle of continious and with random distance between them_#
     prev_cactus = 600   # defines that the first cactus was set on x = 600
@@ -354,6 +364,8 @@ def main():
         
         
         if (add_cactus):    # if the dinosaur passed a cactus it will generate new ones with same method as done previously
+            score += 1
+
             prev_cactus = cacti[len(cacti)-1].x
             prev_cactus += random.randint(200,600)
             cacti.append(Cactus(prev_cactus))
@@ -393,6 +405,8 @@ def main():
             bird.move() #Makes the bird move
         
         if (add_bird):  # after one passes the screen it creates a new one 
+            score += 1
+            
             birds.append(Bird(1800))
             add_bird = False
         
@@ -402,7 +416,7 @@ def main():
         ground.move()   #Makes the ground move to give a perseption of running
         dino.move()     #Makes the dinosaur constantly run
 
-        draw_window(screen, ground, clouds, dino, birds, cacti) #calls the function "draw_window"
+        draw_window(screen, ground, clouds, dino, birds, cacti, score) #calls the function "draw_window"
 
 
 main()
