@@ -41,9 +41,9 @@ class Bird:
         self.img_count = 0
         self.img = self.IMGS[0]
     
-    #_FUNCTION TO MOVE THE PIPE IN X AXIS_#
+    #_FUNCTION TO MOVE THE BIRD IN X AXIS_#
     def move(self):
-        self.x -= self.VEL  #Moves the pipe to the left
+        self.x -= self.VEL  #Moves the bird to the left
 
     #_FUNCTION TO CREATE ANIMATION_#    
     def draw(self, win):
@@ -66,7 +66,7 @@ class Bird:
     so that although the boxes touch themselves, but the mask don't, then tere is no colision."""
     def collide(self, dino, win):
         dino_mask = dino.get_mask() #saves the positions of the dinosaur image
-        bird_mask = pygame.mask.from_surface(self.img)    #saves the obstacle position of the cactus
+        bird_mask = pygame.mask.from_surface(self.img)    #saves the obstacle position of the bird
 
         #checks if the masks collide
         offset = (self.x - dino.x, self.y - round(dino.y))
@@ -387,7 +387,10 @@ def main():
                 add_bird = True
                 rem_bird.append(bird)
             
-            bird.move() #Makes the bi rd move
+            if bird.collide(dino, screen):    # checks of the Dinosaur touched a Bird
+                print('TOUCHED')
+            
+            bird.move() #Makes the bird move
         
         if (add_bird):  # after one passes the screen it creates a new one 
             birds.append(Bird(1800))
