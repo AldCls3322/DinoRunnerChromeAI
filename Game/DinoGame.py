@@ -2,9 +2,9 @@ import pygame
 import neat
 import time, os, random
 
-from Bird import Bird #import the class / object Bird from the "Bird.py" file; and names it as the first variale name after 'from'
+from Bird import Bird #import the class / object Bird from the "Bird.py" file
 from Cactus import Cactus #import the class / object Bird from the "Cactus.py" file
-from Dino import Dino #import the class / object Bird from the "Cactus.py" file
+from Dino import Dino #import the class / object Bird from the "Dino.py" fileg
 
 pygame.font.init()
 
