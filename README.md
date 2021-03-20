@@ -15,8 +15,25 @@ As well as by reading documentation of [NEAT](https://neat-python.readthedocs.io
 
 To run this program you need to install these libraries, you can do this by:
 
-write this lines of code in the terminal
+*write this lines of code in the terminal*
 
 ``` pip install pygame ```
 
 ``` pip install neat-python ```
+
+#
+
+### *Game Folder* ###
+Inside the 'Game' folder you'll find another foler called 'IMGS' which contain the assets | images drawn on screen. 
+
+You'll also find the objects (obstacles and the dinosaur) that may collide with each other. These files are: 
+- Bird.py
+- Cactus.py
+- Dino.py
+
+To run and specify the Neural Network used, you-ll find the file:
+- config-feedforward.txt
+
+Finally the last 2 python files will execute the game.
+- DinoGame: is used to play the game with Bird Obsacles by yourself
+- DinoGame_withAI : will implement NEAT to play the game automatically
