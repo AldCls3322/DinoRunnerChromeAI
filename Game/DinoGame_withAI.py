@@ -14,7 +14,7 @@
     4.4 SETS UP THE NEURAL NETWORK SPECIFICS AND RUNS THE WHOLE PROGRAM / GAME
 """
 
-###__IMPORTING LIBRARIES AND OBJECTS__###
+###__1. IMPORTING LIBRARIES AND OBJECTS__###
 import pygame
 import neat
 import time, os, random
@@ -25,7 +25,7 @@ from Dino import Dino #import the class / object Bird from the "Dino.py" fileg
 
 pygame.font.init()  # start the pygame library
 
-###__CONSTANT VARIABLES__###
+###__2. CONSTANT VARIABLES__###
 
 #_SCREEN SIZES_#
 WIN_WIDTH = 600
@@ -46,7 +46,8 @@ CLOUD_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("Game/IMGS",
 
 gen = 1 # the counter to display how many generations there had been
 
-###__Creates/Defines an object Base__###
+###__3. BACKGROUND OBJECTS__###
+###__3.1 Creates/Defines an object Base__###
 class Ground:
     VEL = 7 # speed at which the ground is going to move
     WIDTH = GROUND_IMG.get_width()
@@ -74,7 +75,7 @@ class Ground:
         win.blit(self.IMG, (self.x1, self.y))   #blit function is like draw
         win.blit(self.IMG, (self.x2, self.y))
 
-###__Creates/Defines an object Cloud__###
+###__3.2 Creates/Defines an object Cloud__###
 class Cloud:
     VEL = 4 # moves slower that the ground to give a better persepction
     IMG = CLOUD_IMG
@@ -96,8 +97,8 @@ class Cloud:
 ###___GAME____###
 #################
 
-###__GAME FUNCTIONS__###
-#_FUNCTION THAT CREATES A SCREEEN_#
+###__4. GAME FUNCTIONS__###
+#_4.1 FUNCTION THAT CREATES A SCREEEN_#
 def draw_window(screen, ground, clouds, dinosaurs, cacti, score, gen):
 
     screen.fill(WHITE)
@@ -126,7 +127,7 @@ def draw_window(screen, ground, clouds, dinosaurs, cacti, score, gen):
 
     pygame.display.update() #refreshes
 
-#_FUCNTION THAT PLAYS THE GAME_#
+#_4.2 FUCNTION THAT PLAYS THE GAME_#
 def eval_genomes(genomes, config):
     # Gets the variables used
     global screen, gen
@@ -251,7 +252,7 @@ def eval_genomes(genomes, config):
 
         draw_window(screen, ground, clouds, dinosaurs, cacti, score, gen) #calls the function "draw_window"
 
-#_RUNS THE NEAT NEURAL NETWORK_#
+#_4.3 RUNS THE NEAT NEURAL NETWORK_#
 def run(config_path):
     # After getting the location of config file
 
@@ -270,7 +271,7 @@ def run(config_path):
     print('\nBest genome:\n{!s}'.format(winner))    # show final stats on terminal
 
 ###__MAIN__###
-###___RUNS PROGRAM IF IT IS RAN DIRECTLY FROM FILE___###
+###___4.4 RUNS PROGRAM IF IT IS RAN DIRECTLY FROM FILE___###
 if __name__ == '__main__':
     local_dir = os.path.dirname(__file__) # It will get the path from the current working directory.
     config_path = os.path.join(local_dir, 'config-feedforward.txt') # Determine path to configuration file. 
