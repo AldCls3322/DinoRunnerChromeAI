@@ -126,6 +126,7 @@ def restart():
 
     #_Making the Screen and defining a Time_#
     screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT)) #sets the window size
+    pygame.display.set_caption("Google Dinosaur Runner Clone") # sets the window name
     screen.fill(WHITE)  # makes the background WHITE
     clock = pygame.time.Clock() #creates a control for frame rates
 

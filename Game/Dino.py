@@ -46,6 +46,7 @@ class Dino:
         if (self.isJumping == True):
             if (self.y > 95):
                 self.isJumping = False
+                self.y = 95
 
             else:
                 if (self.y < 60):
